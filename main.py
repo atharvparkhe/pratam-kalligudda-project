@@ -20,16 +20,10 @@ def preprocess_audio_mfcc(audio_file, target_length=50000, noise_level=0.001):
 
 
 def predict_result(aud):
-    # file_path = aud
-    # with open(file_path, 'rb') as binary_file:
-    #     audio_data = binary_file.read()
-    # audio_stream = io.BytesIO(audio_data)
     mfcc = preprocess_audio_mfcc(audio_file=aud)
     model = tf.keras.models.load_model('prediction_accuracy.keras')
     predicted_accuracy_scores = model.predict(mfcc)
-    # audio_stream = io.BytesIO(audio_file)
-    # print(predicted_accuracy_scores[0][0])
-    return predicted_accuracy_scores[0][0]
+    return float(predicted_accuracy_scores[0][0])
 
 
 # FastAPI
@@ -38,5 +32,5 @@ app = FastAPI()
 @app.post("/upload/")
 async def create_upload_file(file: UploadFile = File(...)):
     aud = io.BytesIO(await file.read())
-    res = float(predict_result(aud))
+    res = predict_result(aud)
     return {"result": res}
